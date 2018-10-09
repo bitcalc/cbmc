@@ -310,6 +310,7 @@ void goto_symext::symex_function_call_code(
   frame.loop_iterations[identifier].count++;
 
   state.source.is_set=true;
+  state.source.function = identifier;
   symex_transition(state, goto_function.body.instructions.begin());
 }
 
@@ -358,7 +359,7 @@ void goto_symext::symex_end_of_function(statet &state)
 {
   // first record the return
   target.function_return(
-    state.guard.as_expr(), state.source.pc->function, state.source);
+    state.guard.as_expr(), state.source.function, state.source);
 
   // then get rid of the frame
   pop_frame(state);
