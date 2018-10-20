@@ -227,16 +227,19 @@ bool static_verifier(
           out << '\n';
         last_function_id = result.function_id;
         const auto &symbol = ns.lookup(last_function_id);
-        out << "******** Function " << symbol.display_name();
+        m.status() << messaget::underline << "Function "
+                   << symbol.display_name();
         function_file = symbol.location.get_file();
         if(!function_file.empty())
-          out << ' ' << function_file;
+          m.status() << ' ' << function_file;
         if(!symbol.location.get_line().empty())
-          out << ':' << symbol.location.get_line();
-        out << '\n';
+          m.status() << ':' << symbol.location.get_line();
+        m.status() << messaget::reset << messaget::eom;
       }
 
-      m.result() << '[' << result.source_location.get_property_id() << ']';
+      m.result() << messaget::faint << '['
+                 << result.source_location.get_property_id() << ']'
+                 << messaget::reset;
 
       if(
         !result.source_location.get_file().empty() &&
