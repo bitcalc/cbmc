@@ -217,6 +217,7 @@ bool static_verifier(
   else
   {
     irep_idt last_function_id;
+    irep_idt function_file;
 
     for(const auto &result : results)
     {
@@ -226,16 +227,29 @@ bool static_verifier(
           out << '\n';
         last_function_id = result.function_id;
         const auto &symbol = ns.lookup(last_function_id);
-        out << "******** Function " << symbol.display_name() << '\n';
+        out << "******** Function " << symbol.display_name();
+        function_file = symbol.location.get_file();
+        if(!function_file.empty())
+          out << ' ' << function_file;
+        if(!symbol.location.get_line().empty())
+          out << ':' << symbol.location.get_line();
+        out << '\n';
       }
 
-      m.result() << '[' << result.source_location.get_property_id() << ']'
-                 << ' ';
+      m.result() << '[' << result.source_location.get_property_id() << ']';
 
-      m.result() << result.source_location;
+      if(
+        !result.source_location.get_file().empty() &&
+        result.source_location.get_file() != function_file)
+      {
+        m.result() << " file " << result.source_location.get_file();
+      }
+
+      if(!result.source_location.get_line().empty())
+        m.result() << " line " << result.source_location.get_line();
 
       if(!result.source_location.get_comment().empty())
-        m.result() << ", " << result.source_location.get_comment();
+        m.result() << ' ' << result.source_location.get_comment();
 
       m.result() << ": ";
 
@@ -260,6 +274,9 @@ bool static_verifier(
 
       m.result() << messaget::eom;
     }
+
+    if(!results.empty())
+      out << '\n';
   }
 
   m.status() << m.bold << "Summary: "
