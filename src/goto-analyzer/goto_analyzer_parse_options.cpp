@@ -229,8 +229,7 @@ void goto_analyzer_parse_optionst::get_command_line_options(optionst &options)
   }
   else if(cmdline.isset("intervals") || cmdline.isset("non-null"))
   {
-    // For backwards compatibility either of these on their own means show
-    options.set_option("show", true);
+    options.set_option("verify", true);
     options.set_option("general-analysis", true);
   }
 
