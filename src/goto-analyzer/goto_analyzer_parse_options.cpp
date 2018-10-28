@@ -57,11 +57,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/unicode.h>
 #include <util/version.h>
 
-#include "taint_analysis.h"
-#include "unreachable_instructions.h"
+#include "show_on_source.h"
 #include "static_show_domain.h"
 #include "static_simplifier.h"
 #include "static_verifier.h"
+#include "taint_analysis.h"
+#include "unreachable_instructions.h"
 
 goto_analyzer_parse_optionst::goto_analyzer_parse_optionst(
   int argc,
@@ -626,7 +627,18 @@ int goto_analyzer_parse_optionst::perform_analysis(const optionst &options)
 
     if(options.get_bool_option("show"))
     {
-      static_show_domain(goto_model, *analyzer, options, out);
+      if(
+        options.get_bool_option("json") || options.get_bool_option("xml") ||
+        options.get_bool_option("dot") ||
+        options.get_bool_option("dependence-graph"))
+      {
+        static_show_domain(goto_model, *analyzer, options, out);
+      }
+      else
+      {
+        show_on_source(goto_model, *analyzer, get_message_handler());
+      }
+
       return CPROVER_EXIT_SUCCESS;
     }
     else if(options.get_bool_option("verify"))
